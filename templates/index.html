@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Compression</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Form Styling */
+        #uploadForm {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #uploadForm label {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        #uploadForm input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #uploadForm input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        #uploadForm input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* Success Message */
+        #responseMessage {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        #responseMessage h2 {
+            font-size: 1.5rem;
+            color: #28a745;
+        }
+
+        #responseMessage a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        #responseMessage a:hover {
+            background-color: #0056b3;
+        }
+
+        /* Loading Spinner */
+        #loadingSpinner {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #loadingSpinner img {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload and Compress Audio File</h1>
+    <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+        <label for="file">Choose a .wav file to upload:</label>
+        <input type="file" name="file" id="file" accept=".wav" required><br>
+        <input type="submit" value="Upload and Compress">
+    </form>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Loading_icon.gif" alt="Loading...">
+        <p>Compressing your file...</p>
+    </div>
+
+    <!-- Success Message and Download Link -->
+    <div id="responseMessage">
+        <h2>File successfully uploaded and compressed!</h2>
+        <a id="downloadLink" href="#" download>Download Compressed File</a>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const responseMessage = document.getElementById('responseMessage');
+        const downloadLink = document.getElementById('downloadLink');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            // Show loading spinner while the file is being processed
+            loadingSpinner.style.display = 'block';
+            responseMessage.style.display = 'none'; // Hide previous response
+
+            const formData = new FormData(form);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            // Hide loading spinner once the file is processed
+            loadingSpinner.style.display = 'none';
+
+            if (response.ok) {
+                // Show the success message and download link
+                responseMessage.style.display = 'block';
+                downloadLink.href = '/uploads/' + data.filename;
+            } else {
+                alert(data.error || 'An error occurred. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
